@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+		<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.ysf.dx.dao.RoleDao" >
+	<select id="findRolePage" parameterType="Role" resultMap="roleMap">
+		select
+			sr.id,
+			sr.name,
+			sr.code,
+			sr.status,
+			sr.createuser,
+			sr.createtime,
+			sr.updateuser,
+			sr.updatetime
+		from
+			sys_role sr
+		<where>
+			<trim suffixOverrides="and">
+				<if test="id != null">sr.id=#{id} and </if>
+				<if test="name != null">sr.name like concat ('%',#{name},'%') and </if>
+				<if test="code != null">sr.code=#{code} and </if>
+				<if test="status != null">sr.status=#{status} and </if>
+			</trim>
+		</where>
+		group by sr.id asc
+	</select>
+
+	<resultMap id="roleMap" type="Role">
+		<id property="id" javaType="java.lang.Long" column="id" />
+		<result property="name" javaType="java.lang.String" column="name"/>
+		<result property="code" javaType="java.lang.String" column="code"/>
+		<result property="status" javaType="java.lang.Integer" column="status"/>
+		<result property="createtime" javaType="java.util.Date" column="createtime"/>
+		<result property="updatetime" javaType="java.util.Date" column="updatetime"/>
+		<association property="createuser" javaType="User" >
+			<id property="id" javaType="java.lang.Long" column="createuser"/>
+		</association>
+		<association property="updateuser" javaType="User">
+			<id property="id" javaType="java.lang.Long" column="updateuser"/>
+		</association>
+	</resultMap>
+
+	<insert id="saveRole" parameterType="Role">
+		insert into sys_role(
+			<trim suffixOverrides=",">
+				<if test="id != null">id , </if>
+				<if test="name != null">name , </if>
+				<if test="code != null">code , </if>
+				<if test="status != null">status , </if>
+			</trim>
+		)
+		values (
+		<trim suffixOverrides=",">
+			<if test="id != null">#{id} , </if>
+			<if test="name != null">#{name} , </if>
+			<if test="code != null">#{code} , </if>
+			<if test="status != null">#{status} , </if>
+		</trim>
+		)
+	</insert>
+
+	<update id="updateRole" parameterType="Role">
+		update sys_role
+			<set>
+				<trim suffixOverrides=",">
+					<if test="name != null">name=#{name}, </if>
+					<if test="code != null">code=#{code}, </if>
+					<if test="status != null">status=#{status}, </if>
+				</trim>
+			</set>
+			<where>
+				<trim suffixOverrides="and">
+					<if test="id != null" > id=#{id} and </if>
+				</trim>
+			</where>
+	</update>
+</mapper>

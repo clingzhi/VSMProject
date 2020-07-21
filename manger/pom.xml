@@ -79,7 +79,23 @@
 		</dependency>
 		<!--Spring Boot Starter Thymeleaf 依赖关系【2】 -->
 
+		<!-- 配置使用 Shiro 作为安全认证框架 [BEGIN] -->
 		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-spring</artifactId>
+			<version>1.5.2</version>
+		</dependency>
+		<!-- 配置使用 Shiro 作为安全认证框架 [END] -->
+
+		<!-- 配置使用 poi 做EXcel文件上传 [BEGIN] -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>4.1.2</version>
+		</dependency>
+		<!-- 配置使用 poi 做EXcel文件上传 [END] -->
+		<dependency>
+
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>

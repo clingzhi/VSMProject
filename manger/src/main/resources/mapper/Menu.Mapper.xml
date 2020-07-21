@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.ysf.dx.dao.MenuDao" >
+	<sql id="selectSql">
+		select
+			sm.id,
+			sm.parentid,
+			sm.text,
+			sm.url,
+			sm.icon,
+			sm.status
+		from
+			sys_menu sm join sys_role_menu srm on sm.id=srm.menuid
+	</sql>
+
+	<select id="findMenuListByParentAndRole" parameterType="java.util.Map" resultMap="menuMap">
+		<include refid="selectSql"></include>
+		<where>
+			<trim suffixOverrides="and">
+				<if test="roleId != null">srm.roleid=#{roleId} and </if>
+				<!-- 对于if标签来说，属于单分支，如果需要用到双分支，那么使用choose -->
+				<choose>
+					<when test="parentId != null">sm.parentid=#{parentId} and </when>
+					<otherwise>sm.parentid is null and </otherwise>
+				</choose>
+				<if test="status != null">sm.status=#{status} and </if>
+			</trim>
+		</where>
+		order by sm.createtime asc
+	</select>
+
+	<select id="findMenuListByQuery" parameterType="java.util.Map" resultMap="menuMap">
+		<include refid="selectSql"></include>
+		<where>
+			<trim suffixOverrides="and">
+				<if test="roleId != null">srm.roleid=#{roleId} and </if>
+			</trim>
+		</where>
+	</select>
+
+	<resultMap id="menuMap" type="Menu">
+		<id property="id" javaType="java.lang.Long" column="id"/>
+		<result property="text" javaType="java.lang.String" column="text"/>
+		<result property="url" javaType="java.lang.String" column="url"/>
+		<result property="icon" javaType="java.lang.String" column="icon"/>
+		<result property="status" javaType="java.lang.Integer" column="status"/>
+		<result property="createtime" javaType="java.util.Date" column="createtime"/>
+		<result property="updatetime" javaType="java.util.Date" column="updatetime"/>
+		<association property="parent" javaType="Menu">
+			<id property="id" javaType="java.lang.Long" column="parentid"/>
+		</association>
+		<association property="createuser" javaType="User">
+			<id property="id" javaType="java.lang.Long" column="createuser"/>
+		</association>
+		<association property="updateuser" javaType="User">
+			<id property="id" javaType="java.lang.Long" column="updateuser"/>
+		</association>
+	</resultMap>
+
+	<delete id="deleteMenuList" parameterType="Role">
+		delete from sys_role_menu
+		<where>
+			<if test="id != null">roleid=#{id}</if>
+		</where>
+	</delete>
+
+	<insert id="updateMneuList" parameterType="java.util.Map">
+		insert into sys_role_menu(
+			<trim suffixOverrides=",">
+				<if test="roleId != null">roleid ,</if>
+				<if test="nodeId != null">menuid ,</if>
+			</trim>
+		) values (
+			<trim suffixOverrides=",">
+				<if test="roleId != null">#{roleId} ,</if>
+				<if test="nodeId != null">#{nodeId} ,</if>
+			</trim>
+		)
+
+	</insert>
+
+	<insert id="save" parameterType="User">
+		insert into sys_user(
+		<trim suffixOverrides=",">
+			<if test="id != null">id, </if>
+			<if test="username != null">username, </if>
+			<if test="cellphone != null">cellphone, </if>
+			<if test="password != null">password, </if>
+			<if test="role != null and role.id != null">roleid, </if>
+			<if test="gender != null">gender, </if>
+			<if test="idcard != null">idcard, </if>
+			<if test="email != null">email, </if>
+			<if test="avatar != null">avatar, </if>
+			<if test="status != null">status, </if>
+			<if test="createuser != null">createuser, </if>
+			<if test="updateuser != null">updateuser, </if>
+		</trim>
+		) values(
+		<trim suffixOverrides=",">
+			<if test="id != null">#{id}, </if>
+			<if test="username != null">#{username}, </if>
+			<if test="cellphone != null">#{cellphone}, </if>
+			<if test="password != null">#{password}, </if>
+			<if test="role != null and role.id != null">#{role.id}, </if>
+			<if test="gender != null">#{gender}, </if>
+			<if test="idcard != null">#{idcard}, </if>
+			<if test="email != null">#{email}, </if>
+			<if test="avatar != null">#{avatar}, </if>
+			<if test="status != null">#{status}, </if>
+			<if test="createuser != null">#{createuser}, </if>
+			<if test="updateuser != null">#{updateuser}, </if>
+		</trim>
+		)
+	</insert>
+</mapper>

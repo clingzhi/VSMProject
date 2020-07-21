@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>角色列表管理</title>
+		<link rel="stylesheet" type="text/css" href="/css/adminlte.min.css">
+		<link rel="stylesheet" type="text/css" href="/css/dataTables.bootstrap4.min.css">
+		<link rel="stylesheet" href="/fontawesome/css/all.min.css">
+		<script type="text/javascript" src="/js/jquery.min.js"></script>
+		<script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
+		<script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="/js/dataTables.bootstrap4.min.js"></script>
+		<script type="text/javascript" src="/js/adminlte.min.js"></script>
+		<script type="text/javascript">
+			$(function () {
+				$("#mytable").DataTable({
+					// 取消本地分页
+					"paging": false,
+					// 关闭搜索功能
+					"searching": false,
+					// 取消页面排序
+					"ordering": false,
+					// 列表获得采取异步方式进行
+					"serverSide": true,
+					// 设定服务器请求地址
+					// 获取表格地址
+					ajax: {
+						// 请求地址
+						url: "/role/page",
+						// 请求方式
+						type: "post",
+						// 设定在请求列表的时候，所需要携带的请求参数
+						data: function(d) {
+							// 获得对应的设置信息
+							var tableSetings = $("#mytable").dataTable().fnSettings();
+							// 删除多余请求参数
+							for(var key in d) {
+								if(key.indexOf("columns")==0||key.indexOf("order")==0||key.indexOf("search")==0){
+									//以columns开头的参数删除
+									delete d[key];
+								}
+							}
+							// 扩展请求时候的数据，重点在于pageNum和pageSize
+							var params = {
+								// 获得表格对象后，
+								// 系统当前页码_iDisplayStart，默认从0开始
+								"pageNum": tableSetings._iDisplayStart + 1,
+								// 每页显示数量
+								"pageSize": tableSetings._iDisplayLength
+							}
+							// 将新增的查询数据扩展到请求参数上
+							$.extend(d, params); //给d扩展参数
+						},
+						// 设定回传的数据格式为JSON
+						dataType: "json",
+						// 过滤数据
+						dataFilter: function(data) {
+							data = JSON.parse(data);
+							var returnData = {};
+							returnData.draw = data.draw;
+							returnData.recordsTotal = data.totalPage;
+							returnData.recordsFiltered = data.totalPage;
+							returnData.data = data.list;
+							return JSON.stringify(returnData);
+						}
+					},
+					// 为表格的每一个字段设定具体的值
+					columnDefs: [{
+						targets: 0,
+						data: function (row, type, val, meta) {
+							// 在序号位置
+							var tableSetings = $("#mytable").dataTable().fnSettings();
+							var begin = tableSetings._iDisplayStart;
+							var size = tableSetings._iDisplayLength;
+							return begin * size + begin + 1;
+						}
+					}, {
+						targets: 1,
+						data: function (row, type, val, meta) {
+							// 在序号位置，row就代表JSON中list所对应的一个位置的数据对象
+							return row.name;
+						}
+					}, {
+						targets: 2,
+						data: function (row, type, val, meta) {
+							// 在序号位置，row就代表JSON中list所对应的一个位置的数据对象
+							return row.code;
+						}
+					}, {
+						targets: 3,
+						data: function (row, type, val, meta) {
+							// 在序号位置，row就代表JSON中list所对应的一个位置的数据对象
+							var status = "";
+							if (row.status == 1) {
+								// 启用状态
+								status = "<a href='#' class='btn btn-success btn-xs'><i class='fas fa-toggle-on'></i>&nbsp;启用</a>";
+							} else {
+								// 禁用状态
+								status = "<a href='#' class='btn btn-danger btn-xs'><i class='fas fa-toggle-off'></i>&nbsp;禁用</a>";
+							}
+							return status;
+						}
+					}, {
+						targets: 4,
+						data: function (row, type, val, meta) {
+							// 在序号位置，row就代表JSON中list所对应的一个位置的数据对象
+							// 按钮一：修改
+							var updateBtn = "<a href='#' class='btn btn-warning btn-xs'><i class='fas fa-wrench'></i>&nbsp;修改</a>";
+							// 按钮二：授权
+							var authBtn = "<a href='javascript:openAuthModal(" + row.id + ")' class='btn btn-info btn-xs'><i class='fas fa-key'></i>&nbsp;授权</a>";
+							// 按钮三；启用/禁用
+							var statusBtn = "";
+							if (row.status == 1) {
+								// 此时为启用状态，那么就是禁用按钮
+								statusBtn = "<a href='#' class='btn btn-danger btn-xs'><i class='fas fa-toggle-off'></i>&nbsp;禁用</a>";
+							} else {
+								// 此时为禁用，那么按钮就是启用
+								statusBtn = "<a href='#' class='btn btn-success btn-xs'><i class='fas fa-toggle-on'></i>&nbsp;启用</a>";
+							}
+							return updateBtn + "&nbsp;" + authBtn + "&nbsp;" + statusBtn;
+						}
+					}],
+					// 显示语言
+					language: {
+						"sProcessing": "处理中...",
+						"sLengthMenu": "显示 _MENU_ 项结果",
+						"sZeroRecords": "没有匹配结果",
+						"sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 页",
+						"sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+						"sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+						"sInfoPostFix": "",
+						"sSearch": "搜索:",
+						"sUrl": "",
+						"sEmptyTable": "表中数据为空",
+						"sLoadingRecords": "载入中...",
+						"sInfoThousands": ",",
+						"oPaginate": {
+							"sFirst": "首页",
+							"sPrevious": "上页",
+							"sNext": "下页",
+							"sLast": "末页"
+						},
+						"oAria": {
+							"sSortAscending": ": 以升序排列此列",
+							"sSortDescending": ": 以降序排列此列"
+						}
+					}
+				});
+			});
+
+			<!-- 打开模态框--角色授权-->
+			function openAuthModal(id) {
+				var url = "/role/auth?id=" + id;
+				parent.openModal("角色授权", url, 460,550);
+			}
+
+
+			<!-- 打开模态框--新增角色方法-->
+			function openSaveRole() {
+				var url = "/role/save" ;
+					parent.openModal("新增角色信息",url , 460,550);
+			}
+		</script>
+	</head>
+	<body style="padding: 15px;">
+		<div class="row">
+			<div class="col-md-12">
+				<a href="javascript:openSaveRole()" class="btn btn-success">
+					<i class="fas fa-user"></i>
+					添加角色
+				</a>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<table id="mytable" class="table table-hover">
+					<thead>
+					<tr>
+						<th>序号</th>
+						<th>角色名称</th>
+						<th>角色编号</th>
+						<th>状态</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>

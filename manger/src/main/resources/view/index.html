@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>汉升车辆管理-首页</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="/fontawesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/css/tempusdominus-bootstrap-4.min.css">
+	<link rel="stylesheet" href="/css/icheck-bootstrap.min.css">
+	<link rel="stylesheet" href="/css/jqvmap.min.css">
+	<link rel="stylesheet" href="/css/adminlte.min.css">
+	<link rel="stylesheet" href="/css/OverlayScrollbars.min.css">
+	<link rel="stylesheet" href="/css/daterangepicker.css">
+	<link rel="stylesheet" href="/css/summernote-bs4.min.css">
+	<script type="text/javascript">
+		// 阻止原始的超链接的连接动作，变为一个 JavaScript 事件
+		function openFrame(url, childText, parentText) {
+			// 设置主页右侧面板显示信息
+			$("#title").text(childText);
+			$("#parent").text(parentText);
+			$("#child").text(childText);
+			// 通过 JavaScript 获得此时组件的高度
+			var height = $("#allcontent").height() - $("#contentHeader").height() - $("#contentfoot").height();
+			var width = $("#allcontent").width();
+			// 找到对应的 iframe 位置，进行插入 HTML 代码
+			var iframe = "<iframe src='" + url + "' style='width:"+width+"px ; height:"+height+"px ; border: 3px;' scrolling='true'></iframe>";
+			$("#content").html(iframe);
+		}
+
+		<!-- 打开模态框-->
+		function openModal(title, url, width, height) {
+			// 进行主题显示
+			// 修改显示标题
+			$("#modalTitle").html(title);
+
+			var iframe = "<iframe src='" + url + "' style='width:"+ width+"px;height:"+ height+"px; border: 0px;' scrolling='true'></iframe>";
+			$("#modalBody").html(iframe)
+
+			// 打开模态框
+			$("#myModal").modal({
+				keyboard: false
+			});
+		}
+
+		<!-- 关闭模态框-->
+		function closeModal() {
+			$("#myModal").modal("hide");
+		}
+	</script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+	<div class="wrapper">
+		<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link" data-widget="pushmenu" href="#" role="button">
+						<i class="fas fa-bars"></i>
+					</a>
+				</li>
+				<!-- 当前登录用户-->
+				<li class="nav-item">
+					<a class="nav-link"  >当前用户：
+						<span class="hidden-xs" th:text="${session.user.username}"></span>
+					</a>
+				</li>
+			</ul>
+			<ul class="navbar-nav ml-auto">
+				<!-- 消息图标处 -->
+				<li class="nav-item dropdown">
+					<a class="nav-link" data-toggle="dropdown" href="#">
+						<i class="far fa-comments"></i>
+						<span class="badge badge-danger navbar-badge"> </span>
+					</a>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link" data-toggle="dropdown" href="#">
+						<i class="far fa-bell"></i>
+						<span class="badge badge-warning navbar-badge"> </span>
+					</a>
+				</li>
+				<li class="nav-link"  >
+					<i class="fas fa-sign-out-alt"></i>
+					<a href="/user/logout">
+						 退出
+					</a>
+				</li>
+			</ul>
+		</nav>
+
+		<aside class="main-sidebar sidebar-dark-primary elevation-4">
+			<a href="index3.html" class="brand-link">
+				<img src="/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+				     style="opacity: .8">
+				<span class="brand-text font-weight-light">汉升车辆管理</span>
+			</a>
+			<div class="sidebar">
+				<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+					<div class="info">
+						<a   class="nav-link">
+							<i class="nav-icon fas fa-certificate" aria-hidden="true" style="text-align: center">
+									菜单栏
+							</i>
+						</a>
+					</div>
+				</div>
+				<nav class="mt-2">
+					<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+						<li class="nav-item has-treeview" th:each="menu:${menuList}" >
+							<a href="#" class="nav-link">
+								<!-- 本来是菜单头像是用th:class="${menu.icon}"获取-->
+								<i th:class="${menu.icon}"></i>
+								<p>
+									<label th:text="${menu.text}"></label>
+									<i class="fas fa-angle-left right"></i>
+								</p>
+							</a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item" th:each="child:${menu.childList}" >
+									<a th:href="|javascript:openFrame('${child.url}', '${child.text}', '${menu.text}')|" class="nav-link">
+										<!-- 本来是菜单头像是用th:class="${child.icon}"获取-->
+										<i th:class="${child.icon}"></i>
+										<p th:text="${child.text}"></p>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</aside>
+
+		<div id="allcontent" class="content-wrapper">
+			<div id="contentHeader" class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 id="title" class="m-0 text-dark"> </h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li id="parent" class="breadcrumb-item"> </li>
+								<li id="child" class="breadcrumb-item active"> </li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+			<section id="content" class="content">
+				首页面
+			</section>
+
+			<footer id="contentfoot" class="main-footer">
+				<strong>Copyright &copy; 2020-2025 <a href="http://www.vms.com">HSCG.com</a>.</strong>
+				<div class="float-right d-none d-sm-inline-block">
+					<b>Version</b> 1.0.0
+					All rights reserved
+				</div>
+			</footer>
+		</div>
+	</div>
+
+	<!-- 模态框 -->
+	<div class="modal fade" id="myModal"  >
+		<div class="modal-dialog" style="width:700px;height:700px">
+			<div class="modal-content" >
+				<!-- 模态框头部 -->
+				<div class="modal-header">
+					<h4 id="modalTitle" class="modal-title"></h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+
+				<!-- 模态框主体 -->
+				<div id="modalBody" class="modal-body"></div>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/jquery.overlayScrollbars.min.js"></script>
+<script src="/js/adminlte.min.js"></script>
+<script src="/js/pages/dashboard2.js"></script>
+<script src="/js/jquery-ui.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/Chart.min.js"></script>
+<script src="/js/sparkline.js"></script>
+<script src="/js/jquery.vmap.min.js"></script>
+<script src="/js/jquery.knob.min.js"></script>
+<script src="/js/moment.min.js"></script>
+<script src="/js/daterangepicker.js"></script>
+<script src="/js/tempusdominus-bootstrap-4.min.js"></script>
+<script src="/js/summernote-bs4.min.js"></script>
+<script src="/js/pages/dashboard.js"></script>
+<script src="/js/demo.js"></script>
+</body>
+</html>
